@@ -1,21 +1,28 @@
-import { Button, Checkbox, Divider, Form, Input } from 'antd';
+import { Button, Checkbox, Divider, Form, Input, message, notification } from 'antd';
 import './style.scss'
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { postRegister } from '../../services/apiService';
 
 const RegisterPage = () => {
-    const [fullname, setFullname] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [phone, setPhone] = useState("")
-    const [loading, isLoading] = useState(false)
+    const navigate = useNavigate()
+    const [isSubmit, setIsSubmit] = useState(false)
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
-    };
-
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+    const onFinish = async (values) => {
+        const { fullName, email, password, phone } = values
+        setIsSubmit(true)
+        const res = await postRegister(fullName, email, password, phone)
+        setIsSubmit(false)
+        if (res?.data?._id) {
+            message.success('Register Successful!')
+            navigate('/login')
+        } else {
+            notification.error({
+                message: 'Register Failure',
+                description: res.message && Array.isArray(res.message) ? res.message : res.message,
+                duration: 5
+            })
+        }
     };
 
     return (
@@ -28,7 +35,6 @@ const RegisterPage = () => {
                 style={{ maxWidth: 600, margin: "0 auto" }}
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
                 autoComplete="off"
             >
                 <h1 style={{ margin: "40px auto", width: "100px" }}>Register</h1>
@@ -36,7 +42,7 @@ const RegisterPage = () => {
                 <Form.Item
                     labelCol={{ span: 24 }}
                     label="Fullname"
-                    name="fullname"
+                    name="fullName"
                     rules={[{ required: true, message: 'Please input your fullname!' }]}
                 >
                     <Input />
@@ -57,7 +63,7 @@ const RegisterPage = () => {
                     name="password"
                     rules={[{ required: true, message: 'Please input your password!' }]}
                 >
-                    <Input.Password />
+                    <Input type='password' />
                 </Form.Item>
 
                 <Form.Item
@@ -70,14 +76,14 @@ const RegisterPage = () => {
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button htmlType="submit" loading={false}>
+                    <Button htmlType="submit" loading={isSubmit}>
                         Register
                     </Button>
                 </Form.Item>
                 <Divider>Or</Divider>
                 <p className='text text-normal'>Do you have an account?
                     <span>
-                        <Link to='/login'> Login</Link>
+                        <Link to='/login'>Login</Link>
                     </span>
                 </p>
             </Form>

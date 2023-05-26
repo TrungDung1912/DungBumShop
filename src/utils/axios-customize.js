@@ -4,9 +4,12 @@ const baseURL = import.meta.env.VITE_BACKEND_URL
 
 const instance = axios.create({
     baseURL: baseURL,
+    withCredentials: true,
 });
 
 // Add a request interceptor
+instance.defaults.headers.common = { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` };
+
 
 instance.interceptors.request.use(function (config) {
     // Do something before request is sent
@@ -20,11 +23,11 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    return response;
+    return response && response.data ? response.data : response;
 }, function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    return Promise.reject(error);
+    return error?.response?.data ?? Promise.reject(error);
 });
 
 

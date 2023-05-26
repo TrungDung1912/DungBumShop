@@ -1,12 +1,12 @@
-.container {
+.login-container {
     height: 100vh;
-    background-color: antiquewhite;
+    background-color: rgb(226, 182, 125);
     position: relative;
     .form-container {
         position: absolute;
         top: 20%;
-        left: 20%;
-        right: 20%;
+        left: 10%;
+        right: 10%;
         background-color: rgb(243, 219, 187);
         border: 1px solid gray; 
         box-shadow: 2px 4px gray;
@@ -15,10 +15,10 @@
         button{
             box-shadow: 1px 2px rgb(69, 82, 82);
             background-color: rgb(161, 162, 162);
-            width: 80px;
+            width: 70px
         }
         input{
-            left: 25%;
+            left: 10%;
         }
         p{
             display: flex;
