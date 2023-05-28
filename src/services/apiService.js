@@ -11,3 +11,7 @@ export const postLogin = (username, password) => {
 export const fetchAccount = () => {
     return axios.get('/api/v1/auth/account')
 }
+
+export const postLogout = () => {
+    return axios.post('/api/v1/auth/logout')
+}

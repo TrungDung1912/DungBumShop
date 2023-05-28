@@ -12,8 +12,14 @@ import Footer from './components/footer';
 import Home from './components/home';
 import RegisterPage from './pages/register';
 import { fetchAccount } from './services/apiService';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { doGetAccountAction } from './redux/account/accountSlice';
+import Loading from './components/loading';
+import NotFound from './components/notfound';
+import AdminPage from './pages/admin';
+import ProtectedRoute from './components/protectedroute';
+import LayoutAdmin from './components/admin/index'
+import ManagerOrder from './pages/order';
 
 const Layout = () => {
   return (
@@ -26,9 +32,14 @@ const Layout = () => {
 }
 
 export default function App() {
+  const isLoading = useSelector(state => state.account.isLoading)
   const dispatch = useDispatch()
 
   const getAccount = async () => {
+    if (window.location.pathname === '/login'
+      || window.location.pathname === '/register'
+      || window.location.pathname === '/') return;
+
     const res = await fetchAccount()
     if (res && res?.data) {
       dispatch(doGetAccountAction(res.data))
@@ -43,7 +54,7 @@ export default function App() {
     {
       path: "/",
       element: <Layout />,
-      errorElement: <div>404 NOT FOUND!</div>,
+      errorElement: <NotFound />,
 
       children: [
         { index: true, element: <Home /> },
@@ -54,6 +65,32 @@ export default function App() {
         {
           path: "book",
           element: <BookPage />,
+        },
+      ],
+    },
+    {
+      path: "/admin",
+      element: <LayoutAdmin />,
+      errorElement: <NotFound />,
+
+      children: [
+        {
+          index: true, element:
+            <ProtectedRoute>
+              <AdminPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "user",
+          element: <ContactPage />,
+        },
+        {
+          path: "book",
+          element: <BookPage />,
+        },
+        {
+          path: "order",
+          element: <ManagerOrder />,
         },
       ],
     },
@@ -69,7 +106,15 @@ export default function App() {
 
   return (
     <>
-      <RouterProvider router={router} />
+      {
+        !isLoading
+          || window.location.pathname === '/login'
+          || window.location.pathname === '/register'
+          || window.location.pathname === '/' ?
+          <RouterProvider router={router} />
+          :
+          <Loading />
+      }
     </>
   )
 }
