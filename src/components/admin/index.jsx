@@ -131,8 +131,8 @@ const LayoutAdmin = () => {
                 <Content>
                     <Outlet />
                 </Content>
-                <Footer style={{ padding: 0 }}>
-                    DungBumShop  <AiFillInfoCircle color='brown' />  Trung Dung - Made with <AiFillHeart color='red' />
+                <Footer style={{ width: "87vw", textAlign: "center" }}>
+                    <span style={{ fontSize: "15px" }}>DungBumShop  <AiFillInfoCircle color='brown' />  Trung Dung - Made with <AiFillHeart color='red' /></span>
                 </Footer>
             </Layout>
         </Layout>
