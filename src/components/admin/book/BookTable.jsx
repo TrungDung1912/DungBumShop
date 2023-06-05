@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Button, Popconfirm, message, notification } from 'antd';
-import InputSearch from './InputSearch';
-import { deleteDeleteUser, getPaginatedPage } from '../../../services/apiService';
+import InputSearchBook from './InputSearchBook';
+import { deleteDeleteUser, getPaginatedPageBook } from '../../../services/apiService';
 import { current } from '@reduxjs/toolkit';
 import { TiUserDelete } from 'react-icons/ti'
-import UserViewDetail from './UserViewDetail';
 import { BiExport, BiImport, BiMessageSquareAdd } from 'react-icons/bi'
 import { TfiReload } from 'react-icons/tfi'
-import UserAddModal from './UserAddModal';
-import UserAddListUsers from './data/UserAddListUsers';
 import moment from 'moment';
 import { MdTipsAndUpdates } from 'react-icons/md'
 import * as XLSX from 'xlsx';
-import UserUpdate from './UserUpdateData';
+import BookViewDetail from './BookViewDetail';
 
 
-// https://stackblitz.com/run?file=demo.tsx
-const UserTable = () => {
-    const [listUser, setListUser] = useState([])
+const BookTable = () => {
+    const [listBook, setListBook] = useState([])
     const [current, setCurrent] = useState(1)
     const [pageSize, setPageSize] = useState(4)
     const [total, setTotal] = useState(0)
@@ -47,12 +43,24 @@ const UserTable = () => {
         },
         {
             title: 'Name',
-            dataIndex: 'fullName',
+            dataIndex: 'mainText',
             sorter: true,
         },
         {
-            title: 'Email',
-            dataIndex: 'email',
+            title: 'Type',
+            dataIndex: 'category',
+            sorter: true,
+
+        },
+        {
+            title: 'Author',
+            dataIndex: 'author',
+            sorter: true,
+
+        },
+        {
+            title: 'Price',
+            dataIndex: 'price',
             sorter: true,
 
         },
@@ -67,12 +75,8 @@ const UserTable = () => {
             sorter: true
         },
         {
-            title: 'Phone',
-            dataIndex: 'phone',
-            sorter: true,
-        },
-        {
             title: 'Action',
+            width: 100,
             render: (text, record, index) => {
                 return (
                     <div style={{ display: "flex", gap: 15 }}>
@@ -127,7 +131,7 @@ const UserTable = () => {
     };
 
     useEffect(() => {
-        // fetchListUsers();
+        // fetchlistBooks();
         fetchUsers();
     }, [current, pageSize, filter, sortQuery]);
 
@@ -140,9 +144,10 @@ const UserTable = () => {
         if (sortQuery) {
             query += `&${sortQuery}`
         }
-        const res = await getPaginatedPage(query)
+        console.log('query', query)
+        const res = await getPaginatedPageBook(query)
         if (res && res.data) {
-            setListUser(res.data.result)
+            setListBook(res.data.result)
             setTotal(res.data.meta.total)
         }
         setIsLoading(false)
@@ -155,8 +160,8 @@ const UserTable = () => {
 
     //export data user JSON to CSV/EXCEL
     const handleExportData = () => {
-        if (listUser.length > 0) {
-            const worksheet = XLSX.utils.json_to_sheet(listUser);
+        if (listBook.length > 0) {
+            const worksheet = XLSX.utils.json_to_sheet(listBook);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
             XLSX.writeFile(workbook, "DataExportUser.csv");
@@ -210,7 +215,7 @@ const UserTable = () => {
         <div className='table-container'>
             <Row gutter={[20, 20]}>
                 <Col span={24}>
-                    <InputSearch handleSearch={handleSearch} />
+                    <InputSearchBook handleSearch={handleSearch} />
                 </Col>
                 <Col span={24} >
                     <Table style={{ margin: "50px auto", width: "85vw" }}
@@ -218,7 +223,7 @@ const UserTable = () => {
                         className='def'
                         columns={columns}
                         loading={isLoading}
-                        dataSource={listUser}
+                        dataSource={listBook}
                         onChange={onChange}
                         rowKey="_id"
                         pagination={{
@@ -237,32 +242,14 @@ const UserTable = () => {
                     />
                 </Col>
             </Row>
-            <UserViewDetail
+            <BookViewDetail
                 openViewDetail={openViewDetail}
                 setOpenViewDetail={setOpenViewDetail}
                 dataViewDetail={dataViewDetail}
                 setDataViewDetail={setDataViewDetail}
             />
-            <UserAddModal
-                openAddModal={openAddModal}
-                setOpenAddModal={setOpenAddModal}
-                fetchUsers={fetchUsers}
-            />
-            <UserAddListUsers
-                openAddListModal={openAddListModal}
-                setOpenAddListModal={setOpenAddListModal}
-                fetchUsers={fetchUsers}
-            />
-            <UserUpdate
-                setOpenUpdateModal={setOpenUpdateModal}
-                openUpdateModal={openUpdateModal}
-                fetchUsers={fetchUsers}
-                setDataUpdateModal={setDataUpdateModal}
-                dataUpdateModal={dataUpdateModal}
-            />
         </div>
     )
 }
 
-
-export default UserTable;
+export default BookTable

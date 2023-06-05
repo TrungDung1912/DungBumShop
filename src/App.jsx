@@ -20,7 +20,8 @@ import AdminPage from './pages/admin';
 import ProtectedRoute from './components/protectedroute';
 import LayoutAdmin from './components/admin/index'
 import ManagerOrder from './pages/order';
-import UserTable from './components/admin/user/userTable';
+import UserTable from './components/admin/user/UserTable';
+import BookTable from './components/admin/book/BookTable';
 
 const Layout = () => {
   return (
@@ -87,7 +88,7 @@ export default function App() {
         },
         {
           path: "book",
-          element: <BookPage />,
+          element: <BookTable />,
         },
         {
           path: "order",

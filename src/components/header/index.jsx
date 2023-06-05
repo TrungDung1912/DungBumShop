@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BsShopWindow } from 'react-icons/bs'
 import { MdAddShoppingCart } from 'react-icons/md';
 import { VscSearchFuzzy } from 'react-icons/vsc';
-import { Divider, Badge, Drawer, message } from 'antd';
+import { Divider, Badge, Drawer, message, Avatar } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'antd';
@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 import './style.scss';
 import { fetchAccount, postLogin, postLogout } from '../../services/apiService';
 import { doGetAccountAction, doLogoutAction } from '../../redux/account/accountSlice';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -39,7 +40,7 @@ const Header = () => {
         }
     }, [])
 
-    const items = [
+    let items = [
         {
             label: <label style={{ cursor: 'pointer' }}>Account Management</label>,
             key: 'account',
@@ -50,9 +51,16 @@ const Header = () => {
                 onClick={() => handleLogout()}
             >Log out</label>,
             key: 'logout',
-        },
-
+        }
     ];
+    if (user?.role === 'ADMIN') {
+        items.unshift({
+            label: <Link to='/admin' style={{ cursor: 'pointer' }}>Administrator Page </Link>,
+            key: 'admin',
+        })
+    }
+
+    const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user?.avatar}`
     return (
         <>
             <div className='header-container'>
@@ -86,12 +94,12 @@ const Header = () => {
                             <li className="navigation__item mobile"><Divider type='vertical' /></li>
                             <li className="navigation__item mobile">
                                 {!isAuthenticated ?
-                                    <span onClick={() => navigate('/login')}> Tài Khoản</span>
+                                    <span onClick={() => navigate('/login')}>Account</span>
                                     :
                                     <Dropdown menu={{ items }} trigger={['click']}>
                                         <a onClick={(e) => e.preventDefault()}>
-                                            <Space>
-                                                Welcome {user?.fullName}
+                                            <Space style={{ color: "black" }}>
+                                                <Avatar src={urlAvatar} /> {user?.fullName}
                                                 <DownOutlined />
                                             </Space>
                                         </a>

@@ -10,7 +10,7 @@ import {
     MenuUnfoldOutlined,
     DownOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Dropdown, Space, message } from 'antd';
+import { Layout, Menu, Dropdown, Space, message, Avatar } from 'antd';
 import { Outlet, useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import './style.scss';
@@ -70,15 +70,14 @@ const LayoutAdmin = () => {
         if (res && res.data) {
             dispatch(doLogoutAction());
             message.success('Logout Successful!');
-            navigate('/')
+            navigate('/login')
         }
     }
 
-
     const itemsDropdown = [
         {
-            label: <label style={{ cursor: 'pointer' }}>Account Management</label>,
-            key: 'account',
+            label: <Link to='/' style={{ cursor: 'pointer' }}>Homepage</Link>,
+            key: 'homepage',
         },
         {
             label: <label
@@ -90,6 +89,7 @@ const LayoutAdmin = () => {
 
     ];
 
+    const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user?.avatar}`
 
     return (
         <Layout
@@ -121,8 +121,8 @@ const LayoutAdmin = () => {
                     </span>
                     <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
                         <a onClick={(e) => e.preventDefault()}>
-                            <Space>
-                                Welcome {user?.fullName}
+                            <Space style={{ color: "black" }}>
+                                <Avatar src={urlAvatar} /> {user?.fullName}
                                 <DownOutlined />
                             </Space>
                         </a>
