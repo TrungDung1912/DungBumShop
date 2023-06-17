@@ -70,7 +70,7 @@ const Header = () => {
                             setOpenDrawer(true)
                         }}>☰</div>
                         <div className='page-header__logo'>
-                            <span className='logo'>
+                            <span className='logo' onClick={() => { navigate('/') }}>
                                 <BsShopWindow className='rotate icon-react' /> DungBumShop
                                 <VscSearchFuzzy className='icon-search' />
                             </span>

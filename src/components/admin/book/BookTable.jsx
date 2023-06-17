@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Button, Popconfirm, message, notification } from 'antd';
 import InputSearchBook from './InputSearchBook';
-import { deleteDeleteUser, getPaginatedPageBook } from '../../../services/apiService';
+import { deleteBook, deleteDeleteUser, getPaginatedPageBook } from '../../../services/apiService';
 import { current } from '@reduxjs/toolkit';
 import { TiUserDelete } from 'react-icons/ti'
 import { BiExport, BiImport, BiMessageSquareAdd } from 'react-icons/bi'
 import { TfiReload } from 'react-icons/tfi'
 import moment from 'moment';
-import { MdTipsAndUpdates } from 'react-icons/md'
+import { BiEditAlt } from 'react-icons/bi'
 import * as XLSX from 'xlsx';
 import BookViewDetail from './BookViewDetail';
+import BookAddModal from './BookAddModal';
+import BookEditModal from './BookEditModal';
+
 
 
 const BookTable = () => {
@@ -19,7 +22,7 @@ const BookTable = () => {
     const [total, setTotal] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
     const [filter, setFilter] = useState("")
-    const [sortQuery, setSortQuery] = useState("")
+    const [sortQuery, setSortQuery] = useState("sort=-updatedAt")
     const [dataViewDetail, setDataViewDetail] = useState("")
     const [openViewDetail, setOpenViewDetail] = useState(false)
     const [openAddModal, setOpenAddModal] = useState(false)
@@ -61,6 +64,12 @@ const BookTable = () => {
         {
             title: 'Price',
             dataIndex: 'price',
+            render: (text, record, index) => {
+                let a = `${record.price}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                return (
+                    a.concat(' đ')
+                )
+            },
             sorter: true,
 
         },
@@ -84,7 +93,7 @@ const BookTable = () => {
                             placement='leftTop'
                             title="Delete the account?"
                             description="Are you want to delete the account?"
-                            onConfirm={() => handleDeleteAccount(record._id)}
+                            onConfirm={() => handleDeleteBook(record._id)}
                             okText="Confirm"
                             cancelText="Cancel"
                         >
@@ -95,18 +104,18 @@ const BookTable = () => {
                         <span onClick={() => {
                             setOpenUpdateModal(true)
                             setDataUpdateModal(record)
-                        }} style={{ cursor: "pointer", color: "green", fontSize: "20px" }}><MdTipsAndUpdates /></span>
+                        }} style={{ cursor: "pointer", color: "green", fontSize: "20px" }}><BiEditAlt /></span>
                     </div>
                 )
             }
         },
     ];
 
-    const handleDeleteAccount = async (account_id) => {
-        const res = await deleteDeleteUser(account_id)
+    const handleDeleteBook = async (book_id) => {
+        const res = await deleteBook(book_id)
         if (res && res.data) {
-            message.success('Delete a account successfully!!!')
-            fetchUsers()
+            message.success('Delete a book successfully!!!')
+            fetchBooks()
         } else {
             notification.error({
                 message: 'Error deleting!!!',
@@ -132,10 +141,10 @@ const BookTable = () => {
 
     useEffect(() => {
         // fetchlistBooks();
-        fetchUsers();
+        fetchBooks();
     }, [current, pageSize, filter, sortQuery]);
 
-    const fetchUsers = async () => {
+    const fetchBooks = async () => {
         setIsLoading(true);
         let query = `current=${current}&pageSize=${pageSize}`
         if (filter) {
@@ -164,7 +173,7 @@ const BookTable = () => {
             const worksheet = XLSX.utils.json_to_sheet(listBook);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-            XLSX.writeFile(workbook, "DataExportUser.csv");
+            XLSX.writeFile(workbook, "DataExportBook.csv");
         }
     }
 
@@ -179,16 +188,6 @@ const BookTable = () => {
                         type='primary'
                         onClick={() => handleExportData()}
                     >Export
-                    </Button>
-
-                    <Button
-                        style={{ display: "flex", gap: 10, alignItems: "center" }}
-                        icon={<BiImport />}
-                        type='primary'
-                        onClick={() => {
-                            setOpenAddListModal(true)
-                        }}
-                    >Import
                     </Button>
 
                     <Button
@@ -247,6 +246,18 @@ const BookTable = () => {
                 setOpenViewDetail={setOpenViewDetail}
                 dataViewDetail={dataViewDetail}
                 setDataViewDetail={setDataViewDetail}
+            />
+            <BookAddModal
+                openAddModal={openAddModal}
+                setOpenAddModal={setOpenAddModal}
+                fetchBooks={fetchBooks}
+            />
+            <BookEditModal
+                openUpdateModal={openUpdateModal}
+                setOpenUpdateModal={setOpenUpdateModal}
+                dataUpdateModal={dataUpdateModal}
+                setDataUpdateModal={setDataUpdateModal}
+                fetchBooks={fetchBooks}
             />
         </div>
     )

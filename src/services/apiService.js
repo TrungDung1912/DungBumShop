@@ -39,3 +39,37 @@ export const updateUpdateUser = (_id, fullName, phone) => {
 export const getPaginatedPageBook = (query) => {
     return axios.get(`/api/v1/book?${query}`)
 }
+
+export const getBookCategory = () => {
+    return axios.get(`api/v1/database/category`)
+}
+
+export const postUploadImageBook = (fileImg) => {
+    const bodyFormData = new FormData();
+    bodyFormData.append('fileImg', fileImg)
+    return axios({
+        method: 'POST',
+        url: '/api/v1/file/upload',
+        data: bodyFormData,
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "upload-type": "book"
+        }
+    })
+}
+
+export const postCreateBook = (thumbnail, slider, mainText, author, price, sold, quantity, category) => {
+    return axios.post('/api/v1/book', { thumbnail, slider, mainText, author, price, sold, quantity, category })
+}
+
+export const putUpdateBook = (id, thumbnail, slider, mainText, author, price, sold, quantity, category) => {
+    return axios.put(`/api/v1/book/${id}`, { thumbnail, slider, mainText, author, price, sold, quantity, category })
+}
+
+export const deleteBook = (id) => {
+    return axios.delete(`/api/v1/book/${id}`)
+}
+
+export const getBookbyID = (id) => {
+    return axios.get(`/api/v1/book/${id}`)
+}
