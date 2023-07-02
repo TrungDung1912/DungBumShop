@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BsShopWindow } from 'react-icons/bs'
 import { MdAddShoppingCart } from 'react-icons/md';
 import { VscSearchFuzzy } from 'react-icons/vsc';
-import { Divider, Badge, Drawer, message, Avatar } from 'antd';
+import { Divider, Badge, Drawer, message, Avatar, Popover } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'antd';
@@ -11,13 +11,18 @@ import './style.scss';
 import { fetchAccount, postLogin, postLogout } from '../../services/apiService';
 import { doGetAccountAction, doLogoutAction } from '../../redux/account/accountSlice';
 import { Link } from 'react-router-dom';
+import AccountManage from '../user/AccountManage';
 
-const Header = () => {
+const Header = (props) => {
+    const { searchTerm, setSearchTerm } = props
     const [openDrawer, setOpenDrawer] = useState(false);
     const isAuthenticated = useSelector(state => state.account.isAuthenticated);
     const user = useSelector(state => state.account.user);
+    const carts = useSelector(state => state.order.carts)
     const navigate = useNavigate();
     const dispatch = useDispatch()
+    const [show, setShow] = useState(false);
+
 
     const handleLogout = async () => {
         const res = await postLogout();
@@ -40,10 +45,18 @@ const Header = () => {
         }
     }, [])
 
+    const handleHistory = () => {
+        navigate('/history')
+    }
+
     let items = [
         {
-            label: <label style={{ cursor: 'pointer' }}>Account Management</label>,
+            label: <label onClick={() => setShow(true)} style={{ cursor: 'pointer' }}>Account Management</label>,
             key: 'account',
+        },
+        {
+            label: <label onClick={() => handleHistory()} style={{ cursor: 'pointer' }}>Order History </label>,
+            key: 'history',
         },
         {
             label: <label
@@ -51,7 +64,8 @@ const Header = () => {
                 onClick={() => handleLogout()}
             >Log out</label>,
             key: 'logout',
-        }
+        },
+
     ];
     if (user?.role === 'ADMIN') {
         items.unshift({
@@ -61,6 +75,30 @@ const Header = () => {
     }
 
     const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user?.avatar}`
+
+    const contentPopover = () => {
+        return (
+            <div className='popcart-body'>
+                <div className='popcart-content'>
+                    {carts?.map((book, index) => {
+                        return (
+                            <div className='book' key={`bool-${index}`}>
+                                <img src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${book?.detail?.thumbnail}`} />
+                                <div>{book.detail.mainText}</div>
+                                <div className='price'>
+                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(`${book?.detail?.price}`)}
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+                <div className='pop-cart-footer'>
+                    <button onClick={() => navigate('/order')}>Show the cart</button>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <>
             <div className='header-container'>
@@ -75,6 +113,7 @@ const Header = () => {
                                 <VscSearchFuzzy className='icon-search' />
                             </span>
                             <input
+                                onChange={(event) => setSearchTerm(event.target.value)}
                                 className="input-search" type={'text'}
                                 placeholder="What things do you want to search?"
                             />
@@ -84,12 +123,22 @@ const Header = () => {
                     <nav className="page-header__bottom" style={{ display: "flex", alignItems: "center" }}>
                         <ul id="navigation" className="navigation" style={{ display: "contents" }}>
                             <li className="navigation__item">
-                                <Badge
-                                    count={5}
-                                    size={"small"}
+                                <Popover
+                                    className="popover-carts"
+                                    placement='topRight'
+                                    rootClassName='popover-carts'
+                                    title={'Products'}
+                                    content={contentPopover}
+                                    arrow={true}
                                 >
-                                    <MdAddShoppingCart className='icon-cart' />
-                                </Badge>
+                                    <Badge
+                                        count={carts?.length ?? 0}
+                                        size={"small"}
+                                        showZero
+                                    >
+                                        <MdAddShoppingCart className='icon-cart' />
+                                    </Badge>
+                                </Popover>
                             </li>
                             <li className="navigation__item mobile"><Divider type='vertical' /></li>
                             <li className="navigation__item mobile">
@@ -122,6 +171,10 @@ const Header = () => {
                 <p>Log out</p>
                 <Divider />
             </Drawer>
+            <AccountManage
+                show={show}
+                setShow={setShow}
+            />
         </>
     )
 };

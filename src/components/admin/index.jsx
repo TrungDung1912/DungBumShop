@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     AppstoreOutlined,
     ExceptionOutlined,
@@ -59,7 +59,7 @@ const items = [
 
 const LayoutAdmin = () => {
     const [collapsed, setCollapsed] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('dashboard');
+    const [activeMenu, setActiveMenu] = useState('');
     const user = useSelector(state => state.account.user);
 
     const navigate = useNavigate();
@@ -73,6 +73,21 @@ const LayoutAdmin = () => {
             navigate('/login')
         }
     }
+
+    useEffect(() => {
+        if (window.location.pathname.includes('/book')) {
+            setActiveMenu('book')
+        }
+        if (window.location.pathname.includes('/')) {
+            setActiveMenu('dashboard')
+        }
+        if (window.location.pathname.includes('/order')) {
+            setActiveMenu('order')
+        }
+        if (window.location.pathname.includes('/user/crud')) {
+            setActiveMenu('crud')
+        }
+    }, [])
 
     const itemsDropdown = [
         {
@@ -105,7 +120,7 @@ const LayoutAdmin = () => {
                     Admin
                 </div>
                 <Menu
-                    defaultSelectedKeys={[activeMenu]}
+                    selectedKeys={[activeMenu]}
                     mode="inline"
                     items={items}
                     onClick={(e) => setActiveMenu(e.key)}

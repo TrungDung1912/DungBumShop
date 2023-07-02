@@ -4,9 +4,10 @@ import { Form, Divider, InputNumber, Button } from "antd"
 import './style.scss'
 import { useEffect, useState } from "react";
 import { getBookCategory, getPaginatedPageBook } from "../../services/apiService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 const Home = () => {
+    const [searchTerm, setSearchTerm] = useOutletContext()
     const [listCategory, setListCategory] = useState([])
     const [listBook, setListBook] = useState([])
     const [current, setCurrent] = useState(1)
@@ -82,7 +83,7 @@ const Home = () => {
     useEffect(() => {
         // fetchlistBooks();
         fetchBooks();
-    }, [current, pageSize, filter, sortQuery]);
+    }, [current, pageSize, filter, sortQuery, searchTerm]);
 
     const fetchBooks = async () => {
         setIsLoading(true);
@@ -92,6 +93,9 @@ const Home = () => {
         }
         if (sortQuery) {
             query += `&${sortQuery}`
+        }
+        if (searchTerm) {
+            query += `&mainText=/${searchTerm}/i` //Search tương đối
         }
         console.log('query', query)
         const res = await getPaginatedPageBook(query)
@@ -166,6 +170,7 @@ const Home = () => {
                         <span> <FilterTwoTone /> Filter Group</span>
                         <ReloadOutlined title="Reset" onClick={() => {
                             form.resetFields()
+                            setSearchTerm('')
                             setFilter('')
                         }} />
                     </div>

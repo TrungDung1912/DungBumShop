@@ -22,12 +22,18 @@ import LayoutAdmin from './components/admin/index'
 import ManagerOrder from './pages/order';
 import UserTable from './components/admin/user/UserTable';
 import BookTable from './components/admin/book/BookTable';
+import './styles/global.scss'
+import Payment from './components/order/Payment';
+import OrderHistory from './components/order/OrderHistory';
+import ManagerOrderr from './components/admin/order/ManagerOrder';
 
 const Layout = () => {
+  const [searchTerm, setSearchTerm] = useState("")
+
   return (
     <div className='layout-app'>
-      <Header />
-      <Outlet />
+      <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <Outlet context={[searchTerm, setSearchTerm]} />
       <Footer />
     </div>
   )
@@ -68,6 +74,24 @@ export default function App() {
           path: "book/:slug",
           element: <BookPage />,
         },
+        {
+          path: "order",
+          element:
+            <ProtectedRoute>
+              <ManagerOrder />
+            </ProtectedRoute>,
+        },
+        {
+          path: "payment",
+          element: <Payment />,
+        },
+        {
+          path: "history",
+          element:
+            <ProtectedRoute>
+              <OrderHistory />
+            </ProtectedRoute>,
+        },
       ],
     },
     {
@@ -92,8 +116,9 @@ export default function App() {
         },
         {
           path: "order",
-          element: <ManagerOrder />,
+          element: <ManagerOrderr />,
         },
+
       ],
     },
     {

@@ -1,0 +1,27 @@
+.popover-carts {
+    .popcart-body {
+        .popcart-content {
+            .book {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 10px;
+                img {
+                    width: 100px;
+                    height: 100px;
+                }
+            }
+        }
+        .pop-cart-footer {
+            display: flex;
+            justify-content: right;
+            button {
+                background-color: antiquewhite;
+                border: none;
+                cursor: pointer;
+                padding: 10px 10px;
+                border-radius: 0.5em;
+                box-shadow: 1px 2px grey;
+            }
+        }
+    }
+}
